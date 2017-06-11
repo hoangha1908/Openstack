@@ -1,6 +1,7 @@
 # Hướng dẫn cài đặt OPENSTACK OCATA sử dụng `script` trên 2 Node
 
 ## 1. Mục tiêu LAB
+- Triển khai thành công Openstack phiên bản Ocata trên Centos  
 - Mô hình này sẽ cài các thành phần Service CORE của OPS bao gồm:
   - Controller
     * Chrony
@@ -21,7 +22,7 @@
 ![img](image/topo.jpg)
 
 ## 3. Chuẩn bị môi trường LAB 
-- Hardware: 4 CPU, 8GB RAM, 50GB HDD
+- Hardware Min: 4 CPU, 8GB RAM, 50GB HDD
 - OS
   - CentOS Server 7.3 64 bit
   - 02 NICs: 
@@ -51,17 +52,17 @@
   
 - Bước 3 - Controller Node: Ssh lại và tiến hành cài đặt Keystone
    ```
-  sh keystone.sh    
+  sh keystone_controller.sh    
   ```
 
 - Bước 4 - Controller Node: Tiến hành cài đặt Glance
   ```
-  sh glance.sh    
+  sh glance_controller.sh    
   ```
   
 - Bước 5 - Controller Node: Tiến hành cài đặt Nova
   ```
-  sh nova.sh    
+  sh nova_controller.sh    
   ```
 - Bước 6 - Compute Node
   * Mở file environment_compute.sh và sửa các tham số sau cho chuẩn môi trường  
@@ -95,11 +96,11 @@
   ```
 - Bước 12 - Controller Node: Tiến hành cài đặt Horizon
   ```
-  sh horizone.sh    
+  sh horizone_controller.sh    
   ```
 - Bước 13 - Controller Node: Verify lại toàn bộ dịch vụ
   ```
-  sh verify.sh    
+  sh verify_controller.sh    
   ```
  
 - Bước 14: Truy cập Horizon: 
