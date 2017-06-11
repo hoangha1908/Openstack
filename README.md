@@ -27,7 +27,7 @@
   - CentOS Server 7.3 64 bit
   - 02 NICs: 
     - `ens32`: dùng để ssh và tải gói cho máy chủ, các Instance cũng đi ra internet theo đường này, sử dụng dải 172.20.80.0/24
-    - `ens33`: dùng để các Service giao tiếp với nhau, sử dụng dải 10.10.100.0/24
+    - `ens33`: dùng để các Service giao tiếp với nhau, sử dụng dải 10.100.10.0/24
 - Tải toàn bộ file script trong repo này xuống cả 2 node (Ae tự làm nhé)
 
 ## 4. Cài đặt theo đúng thứ tự các bước sau
