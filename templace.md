@@ -1,53 +1,53 @@
-# Hu?ng d?n c�i d?t CEPH s? d?ng `ceph-deploy` tr�n 1 m�y duy nh?t (CEPH AIO)
+# Hướng dẫn cài đặt CEPH sử dụng `ceph-deploy` trên 1 máy duy nhất (CEPH AIO)
 
-## 1. M?c ti�u LAB
-- M� h�nh n�y s? c�i t?t c? c�c th�nh ph?n c?a CEPH l�n m?t m�y duy nh?t, bao g?m:
+## 1. Mục tiêu LAB
+- Mô hình này sẽ cài tất cả các thành phần của CEPH lên một máy duy nhất, bao gồm:
   - ceph-deploy
   - ceph-admin
   - mon
   - OSD
-- LAB n�y ch? ph� h?p v?i vi?c nghi�n c?c c�c t�nh nang v� demo th? nghi?m, kh�ng �p d?ng du?c trong th?c t?.
-- Vi?c d?ng CEPH-AIO c� th? ch?y theo d�ng m� h�nh n�y ho?c theo m� h�nh d? t�ch h?p c�ng OpenStack t?i t�i li?u n�y [link t�i li?u]
+- LAB này chỉ phù hợp với việc nghiên cức các tính năng và demo thử nghiệm, không áp dụng được trong thực tế.
+- Việc dựng CEPH-AIO có thể chạy theo đúng mô hình này hoặc theo mô hình để tích hợp cùng OpenStack tại tài liệu này [link tài liệu]
 
-## 2. M� h�nh 
-- S? d?ng m� h�nh du?i d? c�i d?t CEPH AIO, n?u ch? d?ng CEPH AIO th� ch? c?n m?t m�y ch? d? c�i d?t CEPH. 
+## 2. Mô hình 
+- Sử dụng mô hình dưới để cài đặt CEPH AIO, nếu chỉ dựng CEPH AIO thì chỉ cần một máy chủ để cài đặt CEPH. 
 ![img](images/topology_CEPH_AIO_CentOS7.2.png)
 
 ## 3. IP Planning
-- Ph�n ho?ch IP cho c�c m�y ch? trong m� h�nh tr�n, n?u ch? d?ng CEPH-AIO th� ch? c?n quan t�m t?i node CEPH-AIO
+- Phân hoạch IP cho các máy chủ trong mô hình trên, nếu chỉ dựng CEPH-AIO thì chỉ cần quan tâm tới node CEPH-AIO
 ![img](images/ip-Planning-CEPH_AIO_CentOS7.2.png)
 
-## 4. Chu?n b? v� m�i tru?ng LAB
+## 4. Chuẩn bị và môi trường LAB
  
 - OS
   - CentOS Server 7.2 64 bit
-  - 05: HDD, trong d�:
-    - `sda`: s? d?ng d? c�i OS
-    - `sdb`: s? d?ng l�m `journal` (Journal l� m?t l?p cache khi client ghi d? li?u, th?c t? thu?ng d�ng ? SSD d? l�m cache)
-    - `sdc, sdd, sde`: s? d?ng l�m OSD (noi ch?a d? li?u c?a client)
+  - 05: HDD, trong đó:
+    - `sda`: sử dụng để cài OS
+    - `sdb`: sử dụng làm `journal` (Journal là một lớp cache khi client ghi dữ liệu, thực tế thường dùng ổ SSD để làm cache)
+    - `sdc, sdd, sde`: sử dụng làm OSD (nơi chứa dữ liệu của client)
   - 02 NICs: 
-    - `eno16777728`: d�ng client (c�c m�y trong OpenStack) s? d?ng, s? d?ng d?i 10.10.10.0/24
-    - `eno33554952`: d�ng d? ssh v� t?i g�i cho m�y ch? CEPH AIO, s? d?ng d?i172.16.69.0/24
-    - `eno50332176`: d�ng d? replicate cho CEPH, d?i 10.10.30.0/24
+    - `eno16777728`: dùng client (các máy trong OpenStack) sử dụng, sử dụng dải 10.10.10.0/24
+    - `eno33554952`: dùng để ssh và tải gói cho máy chủ CEPH AIO, sử dụng dải172.16.69.0/24
+    - `eno50332176`: dùng để replicate cho CEPH, dải 10.10.30.0/24
   
 - CEPH Jewel
 
-## 5. C�i d?t CEPH tr�n m�y ch? CEPH
-- N?u chua login v�o m�y ch? CEPH-AIO b?ng quy?n `root` th� th?c hi?n chuy?n sang quy?n `root`
+## 5. Cài đặt CEPH trên máy chủ CEPH
+- Nếu chưa login vào máy chủ CEPH-AIO bằng quyền `root` thì thực hiện chuyển sang quyền `root`
   ```sh
   su -
   ```
 
-- Update c�c g�i cho m�y ch? 
+- Update các gói cho máy chủ 
   ```sh
   yum update -y
   ```
 
-- �?t hostname cho m�y c�i AIO
+- Đặt hostname cho máy cài AIO
   ```sh
   hostnamectl set-hostname cephaio  
   ```
-- Thi?t l?p IP cho m�y CEPH AIO
+- Thiết lập IP cho máy CEPH AIO
   ```sh
   echo "Setup IP  eno16777728"
   nmcli c modify eno16777728 ipv4.addresses 10.10.10.71/24
@@ -67,7 +67,7 @@
   nmcli con mod eno50332176 connection.autoconnect yes
   ```
   
-- C?u h�nh c�c th�nh ph?n m?ng co b?n
+- Cấu hình các thành phần mạng cơ bản
   ```sh
   sudo systemctl disable firewalld
   sudo systemctl stop firewalld
@@ -77,24 +77,24 @@
   sudo systemctl start network
   ```
 
-- V� hi?u h�a Selinux
+- Vô hiệu hóa Selinux
   ```sh
   sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
   ```
 
-- S?a file host 
+- Sửa file host 
   ```sh
   echo "10.10.10.71 cephaio" >> /etc/hosts
   ```
 
-- Kh?i d?ng l?i m�y ch? sau khi c?u h�nh co b?n.
+- Khởi động lại máy chủ sau khi cấu hình cơ bản.
   ```sh
   init 6
   ```
  
-- �ang nh?p l?i b?ng quy?n `root` sau khi m�y ch? reboot xong.
+- Đăng nhập lại bằng quyền `root` sau khi máy chủ reboot xong.
 
-- Khai b�o repos cho CEPH 
+- Khai báo repos cho CEPH 
   ```sh
   sudo yum install -y yum-utils
   sudo yum-config-manager --add-repo https://dl.fedoraproject.org/pub/epel/7/x86_64/ 
@@ -116,22 +116,22 @@
   EOF
   ```
 
-- Update sau khi khai b�o repo
+- Update sau khi khai báo repo
   ```sh
   sudo yum -y update
   ```
   
-- T?o user `ceph-deploy`
+- Tạo user `ceph-deploy`
   ```sh
   sudo useradd -d /home/ceph-deploy -m ceph-deploy
   ```  
   
-- �?t m?t kh?u cho user `ceph-deploy`
+- Đặt mật khẩu cho user `ceph-deploy`
   ```sh
   sudo passwd ceph-deploy
   ```
   
-- Ph�n quy?n cho user `ceph`
+- Phân quyền cho user `ceph`
   ```sh
   echo "ceph-deploy ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph-deploy
   chmod 0440 /etc/sudoers.d/ceph-deploy
@@ -139,38 +139,38 @@
   sed -i s'/Defaults requiretty/#Defaults requiretty'/g /etc/sudoers
   ```
 
-- Chuy?n sang user `ceph-deploy`
+- Chuyển sang user `ceph-deploy`
   ```sh
   su - ceph-deploy
   ```
 
-- T?o ssh key cho user `ceph-deploy`
+- Tạo ssh key cho user `ceph-deploy`
   ```sh
   ssh-keygen -t rsa
   ```
 
-- Th?c hi?n copy ssh key, nh?p yes v� m?t kh?u c?a user `ceph-deploy` ? bu?c tru?c.
+- Thực hiện copy ssh key, nhập yes và mật khẩu của user `ceph-deploy` ở bước trước.
   ```sh
   ssh-copy-id ceph-deploy@cephaio
   ```
 
-- C�i d?t `ceph-deploy` 
+- Cài đặt `ceph-deploy` 
   ```sh
   sudo yum install -y ceph-deploy
   ```
 
-- T?o thu m?c d? ch?a c�c file c?n thi?t cho vi?c c�i d?t CEPH 
+- Tạo thư mục để chứa các file cần thiết cho việc cài đặt CEPH 
   ```sh
   mkdir cluster-ceph
   cd cluster-ceph
   ```
 
-- Thi?t l?p c�c file c?u h�nh cho CEPH.
+- Thiết lập các file cấu hình cho CEPH.
   ```sh
   ceph-deploy new cephaio
   ```
 
-- Sau khi th?c hi?n l?nh tr�n xong, s? thu du?c 03 file ? du?i (s? d?ng l?nh `ll -alh` d? xem). Trong d� c?n c?p nh?t file `ceph.conf` d? c�i d?t CEPH du?c ho�n ch?nh.
+- Sau khi thực hiện lệnh trên xong, sẽ thu được 03 file ở dưới (sử dụng lệnh `ll -alh` để xem). Trong đó cần cập nhật file `ceph.conf` để cài đặt CEPH được hoàn chỉnh.
   ```sh
   [ceph-deploy@cephaio cluster-ceph]$ ls -alh
   total 16K
@@ -181,7 +181,7 @@
   -rw-------. 1 ceph-deploy ceph-deploy   73 Apr 14 09:36 ceph.mon.keyring
   ```
 
-- Th�m c�c d�ng du?i v�o file `ceph.conf` v?a du?c t?o ra ? tr�n
+- Thêm các dòng dưới vào file `ceph.conf` vừa được tạo ra ở trên
   ```sh
   echo "osd pool default size = 2" >> ceph.conf
   echo "osd crush chooseleaf type = 0" >> ceph.conf
@@ -190,30 +190,30 @@
   echo "cluster network = 10.10.30.0/24" >> ceph.conf
   ```
   
-- C�i d?t CEPH, thay `cephaio` b?ng t�n hostname c?a m�y b?n n?u c� thay d?i.
+- Cài đặt CEPH, thay `cephaio` bằng tên hostname của máy bạn nếu có thay đổi.
   ```sh
   ceph-deploy install cephaio
   ```
   
-  - Sau khi c�i xong, n?u th�nh c�ng s? c� k?t qu? nhu sau.
+  - Sau khi cài xong, nếu thành công sẽ có kết quả như sau.
     ```sh
     [cephaio][DEBUG ] Complete!
     [cephaio][INFO  ] Running command: sudo ceph --version
     [cephaio][DEBUG ] ceph version 10.2.7 (50e863e0f4bc8f4b9e31156de690d765af245185
     ```
 
-- C?u h�nh `MON` (m?t th�nh ph?n c?a CEPH)
+- Cấu hình `MON` (một thành phần của CEPH)
   ```sh
   ceph-deploy mon create-initial
   ```
 
-- Sau khi th?c hi?n l?nh d? c?u h�nh `MON` xong, s? sinh th�m ra 04 file : 
+- Sau khi thực hiện lệnh để cấu hình `MON` xong, sẽ sinh thêm ra 04 file : 
   - `ceph.bootstrap-mds.keyring`
   - `ceph.bootstrap-osd.keyring` 
   - `ceph.bootstrap-rgw.keyring`
   - `ceph.client.admin.keyring`
 
-- Quan s�t b?ng l?nh `ll -alh`
+- Quan sát bằng lệnh `ll -alh`
   ```sh
   [ceph-deploy@cephaio cluster-ceph]$ ls -lah
   total 160K
@@ -228,60 +228,60 @@
   -rw-------. 1 ceph-deploy ceph-deploy   73 Apr 14 10:18 ceph.mon.keyring
   ```
 
-- T?o c�c OSD cho CEPH, thay `cephaio` b?ng t�n hostname c?a m�y b?n 
+- Tạo các OSD cho CEPH, thay `cephaio` bằng tên hostname của máy bạn 
   ```sh
   ceph-deploy osd prepare cephaio:sdc:/dev/sdb
   ceph-deploy osd prepare cephaio:sdd:/dev/sdb
   ceph-deploy osd prepare cephaio:sde:/dev/sdb
   ```
 
-- Active c�c OSD v?a t?o ? tr�n
+- Active các OSD vừa tạo ở trên
   ```sh
   ceph-deploy osd activate cephaio:/dev/sdc1:/dev/sdb1
   ceph-deploy osd activate cephaio:/dev/sdd1:/dev/sdb2
   ceph-deploy osd activate cephaio:/dev/sde1:/dev/sdb3
   ```
 
-- Sau khi c?u h�nh c�c OSD xong, ki?m tra xem c�c ph�n v�ng b?ng l?nh `sudo lsblk`, n?u th�nh c�ng, k?t qu? nhu sau
+- Sau khi cấu hình các OSD xong, kiểm tra xem các phân vùng bằng lệnh `sudo lsblk`, nếu thành công, kết quả như sau
   ```sh
   [ceph-deploy@cephaio cluster-ceph]$ lsblk
   NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
   sda               8:0    0   60G  0 disk
-  +-sda1            8:1    0  500M  0 part /boot
-  +-sda2            8:2    0 59.5G  0 part
-    +-centos-root 253:0    0 35.9G  0 lvm  /
-    +-centos-swap 253:1    0    6G  0 lvm  [SWAP]
-    +-centos-home 253:2    0 17.5G  0 lvm  /home
+  ├─sda1            8:1    0  500M  0 part /boot
+  └─sda2            8:2    0 59.5G  0 part
+    ├─centos-root 253:0    0 35.9G  0 lvm  /
+    ├─centos-swap 253:1    0    6G  0 lvm  [SWAP]
+    └─centos-home 253:2    0 17.5G  0 lvm  /home
   sdb               8:16   0   50G  0 disk
-  +-sdb1            8:17   0  7.8G  0 part
-  +-sdb2            8:18   0  7.8G  0 part
-  +-sdb3            8:19   0  7.8G  0 part
+  ├─sdb1            8:17   0  7.8G  0 part
+  ├─sdb2            8:18   0  7.8G  0 part
+  └─sdb3            8:19   0  7.8G  0 part
   sdc               8:32   0   50G  0 disk
-  +-sdc1            8:33   0   50G  0 part /var/lib/ceph/osd/ceph-0
+  └─sdc1            8:33   0   50G  0 part /var/lib/ceph/osd/ceph-0
   sdd               8:48   0   50G  0 disk
-  +-sdd1            8:49   0   50G  0 part /var/lib/ceph/osd/ceph-1
+  └─sdd1            8:49   0   50G  0 part /var/lib/ceph/osd/ceph-1
   sde               8:64   0   50G  0 disk
-  +-sde1            8:65   0   50G  0 part /var/lib/ceph/osd/ceph-2
+  └─sde1            8:65   0   50G  0 part /var/lib/ceph/osd/ceph-2
   sr0              11:0    1  603M  0 rom
   [ceph-deploy@cephaio cluster-ceph]$
   ```
 
-- T?o file config v� key
+- Tạo file config và key
   ```sh
   ceph-deploy admin cephaio
   ```
 
-- Ph�n quy?n cho file `/etc/ceph/ceph.client.admin.keyring`
+- Phân quyền cho file `/etc/ceph/ceph.client.admin.keyring`
   ```sh
   sudo chmod +r /etc/ceph/ceph.client.admin.keyring
   ```
   
-- Ki?m tra tr?ng th�i c?a CEPH sau khi c�i
+- Kiểm tra trạng thái của CEPH sau khi cài
   ```sh
   ceph -s
   ```  
   
-  - K?t c?a l?nh `ceph -s`
+  - Kết của lệnh `ceph -s`
     ```sh
     [ceph-deploy@cephaio cluster-ceph]$   ceph -s
       cluster ae46be36-dee3-4bb9-9448-91aa148b301e
@@ -295,7 +295,7 @@
                     64 active+clean
   ```
   
-- Ki?m tra c�c OSD b?ng l?nh `ceph osd tree`, k?t qu? nhu sau:
+- Kiểm tra các OSD bằng lệnh `ceph osd tree`, kết quả như sau:
   ```sh
   [ceph-deploy@cephaio cluster-ceph]$ ceph osd tree
   ID WEIGHT  TYPE NAME        UP/DOWN REWEIGHT PRIMARY-AFFINITY
@@ -306,32 +306,32 @@
    2 0.04880         osd.2         up  1.00000          1.00000
   ```
   
-- Ki?m tra b?ng l?nh `ceph health`, k?t qu? nhu sau l� ok.
+- Kiểm tra bằng lệnh `ceph health`, kết quả như sau là ok.
   ```sh
   [ceph-deploy@cephaio cluster-ceph]$ ceph health
   HEALTH_OK
   ```
 
-## 6. C?u h�nh ceph d? client s? d?ng
-### 6.1. C?u h�nh client -  CentOS 7.x 64 bit
-- Th?c hi?n map v� mount c�c rbd cho client l� CentOS 7.x
+## 6. Cấu hình ceph để client sử dụng
+### 6.1. Cấu hình client -  CentOS 7.x 64 bit
+- Thực hiện map và mount các rbd cho client là CentOS 7.x
 
-#### Bu?c 1: Chu?n b? tr�n client 
-- Login v�o m�y ch? v� chuy?n sang quy?n `root`
+#### Bước 1: Chuẩn bị trên client 
+- Login vào máy chủ và chuyển sang quyền `root`
   ```sh
   su -
   ```
 
-- Update c�c g�i cho m�y ch? 
+- Update các gói cho máy chủ 
   ```sh
   yum update -y
   ```
 
-- �?t hostname cho m�y c�i CentOS Client1
+- Đặt hostname cho máy cài CentOS Client1
   ```sh
   hostnamectl set-hostname centos7client1  
   ```
-- Thi?t l?p IP cho m�y CEPH AIO
+- Thiết lập IP cho máy CEPH AIO
   ```sh
   echo "Setup IP  eno16777728"
   nmcli c modify eno16777728 ipv4.addresses 10.10.10.51/24
@@ -347,7 +347,7 @@
   nmcli con mod eno16777728 connection.autoconnect yes
   ```
   
-- C?u h�nh c�c th�nh ph?n m?ng co b?n
+- Cấu hình các thành phần mạng cơ bản
   ```sh
   sudo systemctl disable firewalld
   sudo systemctl stop firewalld
@@ -357,25 +357,25 @@
   sudo systemctl start network
   ```
 
-- V� hi?u h�a Selinux
+- Vô hiệu hóa Selinux
   ```sh
   sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
   ```
 
-- S?a file host 
+- Sửa file host 
   ```sh
   echo "10.10.10.71 cephaio" >> /etc/hosts
   echo "10.10.10.51 centos7client1" >> /etc/hosts
   ```
 
-- Kh?i d?ng l?i m�y ch? sau khi c?u h�nh co b?n.
+- Khởi động lại máy chủ sau khi cấu hình cơ bản.
   ```sh
   init 6
   ```
  
-- �ang nh?p l?i b?ng quy?n `root` sau khi m�y ch? reboot xong.
+- Đăng nhập lại bằng quyền `root` sau khi máy chủ reboot xong.
 
-- Khai b�o repos cho CEPH 
+- Khai báo repos cho CEPH 
   ```sh
   sudo yum install -y yum-utils
   sudo yum-config-manager --add-repo https://dl.fedoraproject.org/pub/epel/7/x86_64/ 
@@ -397,22 +397,22 @@
   EOF
   ```
 
-- Update sau khi khai b�o repo
+- Update sau khi khai báo repo
   ```sh
   sudo yum -y update
   ```
   
-- T?o user `ceph-deploy`
+- Tạo user `ceph-deploy`
   ```sh
   sudo useradd -d /home/ceph-deploy -m ceph-deploy
   ```  
   
-- �?t m?t kh?u cho user `ceph-deploy`
+- Đặt mật khẩu cho user `ceph-deploy`
   ```sh
   sudo passwd ceph-deploy
   ```
   
-- Ph�n quy?n cho user `ceph`
+- Phân quyền cho user `ceph`
   ```sh
   echo "ceph-deploy ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph-deploy
   chmod 0440 /etc/sudoers.d/ceph-deploy
@@ -420,49 +420,49 @@
   sed -i s'/Defaults requiretty/#Defaults requiretty'/g /etc/sudoers
   ```
 
-#### Bu?c 2: �?ng tr�n node CEPH-AIO th?c hi?n c�c l?nh du?i.
-- Login v�o m�y ch? CEPH AIO v� th?c hi?n c�c l?nh du?i
-  - Chuy?n sang t�i kho?n `root`
+#### Bước 2: Đứng trên node CEPH-AIO thực hiện các lệnh dưới.
+- Login vào máy chủ CEPH AIO và thực hiện các lệnh dưới
+  - Chuyển sang tài khoản `root`
     ```sh
     su -
     ```
-  - Khai b�o th�m host c?a client 
+  - Khai báo thêm host của client 
     ```sh
     echo "10.10.10.51 centos7client1" >> /etc/hosts
     ```
     
-  - Chuy?n sang t�i kho?n `ceph-deploy` d? th?c hi?n c�i d?t
+  - Chuyển sang tài khoản `ceph-deploy` để thực hiện cài đặt
     ```sh
     sudo su - ceph-deploy
     
     cd cluster-ceph
     ```
     
-  - Copy ssh key d� t?o tru?c d� sang client, g� `yes` v� nh?p m?t kh?u c?a user `ceph-deploy` ph�a client d� t?o tru?c d�.
+  - Copy ssh key đã tạo trước đó sang client, gõ `yes` và nhập mật khẩu của user `ceph-deploy` phía client đã tạo trước đó.
     ```sh
     ssh-copy-id ceph-deploy@centos7client1
     ```
   
-- Th?c hi?n copy file config cho ceph v� key sang client
+- Thực hiện copy file config cho ceph và key sang client
   ```sh
   ceph-deploy install centos7client1 
   ```
   
-  - Sau khi k?t th�c qu� tr�nh c�i d?t cho client, n?u th�nh c�ng s? c� b�o k?t qu? nhu sau ? m�n h�nh.
+  - Sau khi kết thúc quá trình cài đặt cho client, nếu thành công sẽ có báo kết quả như sau ở màn hình.
     ```sh
     [centos7client1][DEBUG ] Complete!
     [centos7client1][INFO  ] Running command: sudo ceph --version
     [centos7client1][DEBUG ] ceph version 10.2.7 (50e863e0f4bc8f4b9e31156de690d765af245185)
     ```
-  - Ti?p t?c th?c hi?n l?nh d? copy c�c file c?n thi?t t? node CEPH-AIO sang client
+  - Tiếp tục thực hiện lệnh để copy các file cần thiết từ node CEPH-AIO sang client
     ```sh
     ceph-deploy admin centos7client1
     ```   
-  - Th?c hi?n xong l?nh tr�n, ceph-deploy s? copy c�c file c?n thi?t v�o thu m?c `/etc/ceph` c?a client. Chuy?n sang client d? th?c hi?n ti?p c�c thao t�c. 
+  - Thực hiện xong lệnh trên, ceph-deploy sẽ copy các file cần thiết vào thư mục `/etc/ceph` của client. Chuyển sang client để thực hiện tiếp các thao tác. 
   
-#### Bu?c 3: Th?c hi?n c�c thao t�c d? s? d?ng rbd tr�n Client.
-- �ang nh?p v�o t�i kho?n `root` c?a client (Trong ph?n n�y client l� CentOS 7)
-- Th?c hi?n vi?c ki?m tra c�c g�i `ceph` d� du?c c�i b?ng l?nh `rpm -qa | grep ceph`
+#### Bước 3: Thực hiện các thao tác để sử dụng rbd trên Client.
+- Đăng nhập vào tài khoản `root` của client (Trong phần này client là CentOS 7)
+- Thực hiện việc kiểm tra các gói `ceph` đã được cài bằng lệnh `rpm -qa | grep ceph`
   ```sh
   [root@centos7client1 yum.repos.d]# rpm -qa | grep ceph
   python-cephfs-10.2.7-0.el7.x86_64
@@ -478,47 +478,47 @@
   ceph-release-1-1.el7.noarch
   ```
 
-- K�ch ho?t rbdmap d? kh?i d?ng c�ng OS.
+- Kích hoạt rbdmap để khởi động cùng OS.
   ```sh
   [root@centos7client1 ceph]# systemctl enable rbdmap
   Created symlink from /etc/systemd/system/multi-user.target.wants/rbdmap.service to /usr/lib/systemd/system/rbdmap.service.
   ```
   
-- T?o 1 RBD c� dung lu?ng 10Gb
+- Tạo 1 RBD có dung lượng 10Gb
   ```sh
   rbd create disk02 --size 10240
   ```
-  - C� th? ki?m tra l?i k?t qu? t?o b?ng l?nh
+  - Có thể kiểm tra lại kết quả tạo bằng lệnh
     ```sh
     rbd ls -l
     ```
  
-- Ch?y l?nh du?i d? fix l?i `RBD image feature set mismatch. You can disable features unsupported by the kernel with "rbd feature disable".` ? b?n  CEPH Jewel. Luu � t? kh�a `disk01` trong l?nh, n� l� t�n image c?a rbd du?c t?o.
+- Chạy lệnh dưới để fix lỗi `RBD image feature set mismatch. You can disable features unsupported by the kernel with "rbd feature disable".` ở bản  CEPH Jewel. Lưu ý từ khóa `disk01` trong lệnh, nó là tên image của rbd được tạo.
   ```sh
   rbd feature disable rbd/disk01 fast-diff,object-map,exclusive-lock,deep-flatten
   ```
 
   
-- Th?c hi?n map rbd v?a t?o 
+- Thực hiện map rbd vừa tạo 
   ```sh
   sudo rbd map disk01
   ```
-  - Ki?m tra l?i k?t qu? map b?ng l?nh du?i
+  - Kiểm tra lại kết quả map bằng lệnh dưới
     ```sh
     rbd showmapped 
     ```
   
-- Th?c hi?n format disk v?a du?c map
+- Thực hiện format disk vừa được map
   ```sh
   sudo mkfs.xfs /dev/rbd0
   ```
   
-- Th?c hi?n mount disk v?a du?c format d? s? d?ng (mount v�o thu m?c `mnt` c?a client)
+- Thực hiện mount disk vừa được format để sử dụng (mount vào thư mục `mnt` của client)
   ```sh
   sudo mount /dev/rbd0 /mnt
   ```
 
-- Ki?m tra l?i vi?c mount d� th�nh c�ng hay chua b?ng m?t trong c�c l?nh du?i
+- Kiểm tra lại việc mount đã thành công hay chưa bằng một trong các lệnh dưới
   ```sh
   df -hT
   ```
@@ -526,39 +526,39 @@
   ```sh
   lsblk
   ```
-- T?o th? 1 file 5GB v�o thu m?c `/mnt` b?ng l?nh `dd`. L?nh n�y th?c hi?n tr�n client.
+- Tạo thử 1 file 5GB vào thư mục `/mnt` bằng lệnh `dd`. Lệnh này thực hiện trên client.
   ```sh
   cd /mnt 
   
   dd if=/dev/zero of=test bs=1M count=5000
   ```
-  - N?u mu?n quan s�t qu� tr�nh ghi d?c tr�n server CEPH-AIO th� th?c hi?n l?nh `ceph -w` 
+  - Nếu muốn quan sát quá trình ghi đọc trên server CEPH-AIO thì thực hiện lệnh `ceph -w` 
 
-- M?c d?nh khi kh?i d?ng l?i th� vi?c map rbd s? b? m?t, x? l� nhu sau:
-  - M? file /etc/ceph/rbdmap v� th�m d�ng du?i
+- Mặc định khi khởi động lại thì việc map rbd sẽ bị mất, xử lý như sau:
+  - Mở file /etc/ceph/rbdmap và thêm dòng dưới
     ```sh
     rbd/disk01   id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
     ```
-    - Luu � c?n khai b�o pool `rbd` v� t�n images l� `disk01` d� du?c khai b�o ? b�n tr�n.
+    - Lưu ý cần khai báo pool `rbd` và tên images là `disk01` đã được khai báo ở bên trên.
     
-  - S?a file `/etc/fstab` d? vi?c mount du?c th?c hi?n m?i khi kh?i d?ng l?i OS, th�m d�ng
+  - Sửa file `/etc/fstab` để việc mount được thực hiện mỗi khi khởi động lại OS, thêm dòng
     ```sh
     /dev/rbd0   /mnt  xfs defaults,noatime,_netdev        0       0
     ```
     
-  - Trong qu� tr�nh lab v?i client l� ubuntu v� centos t�i g?p hi?n tu?ng kh?i d?ng l?i Client 2 l?n th� m?i dang nh?p du?c, chua hi?u t?i sao l?i b? t�nh tr?ng nhu v?y.
+  - Trong quá trình lab với client là ubuntu và centos tôi gặp hiện tượng khởi động lại Client 2 lần thì mới đăng nhập được, chưa hiểu tại sao lại bị tình trạng như vậy.
 
-### 6.2. C?u h�nh client - Ubuntu Server 14.04 64 bit
-- Bu?c n�y s? hu?ng d?n s? d?ng RBD c?a CEPH d? cung c?p cho c�c Client
+### 6.2. Cấu hình client - Ubuntu Server 14.04 64 bit
+- Bước này sẽ hướng dẫn sử dụng RBD của CEPH để cung cấp cho các Client
 
-#### Bu?c 1: Chu?n b? tr�n Client 
+#### Bước 1: Chuẩn bị trên Client 
 
-- Login v�o m�y ch? client v� chuy?n sang quy?n `root`
+- Login vào máy chủ client và chuyển sang quyền `root`
   ```sh
   su -
   ```
 
-- C?u h�nh IP cho c�c NICs theo IP Planning
+- Cấu hình IP cho các NICs theo IP Planning
   ```sh
   cp /etc/network/interfaces  /etc/network/interfaces.orig
   
@@ -586,88 +586,88 @@
   EOF
   ```
 
-- Thi?t l?p hostname
+- Thiết lập hostname
   ```sh
   echo "ubuntuclient2" > /etc/hostname
   hostname -F /etc/hostname
   ```
-- S?a file host 
+- Sửa file host 
   ```sh
   echo "10.10.10.71 cephaio" >> /etc/hosts
   echo "10.10.10.52 ubuntuclient2" >> /etc/hosts
   ```
-- Khai b�o Repo cho CEPH d?i v?i Ubuntu Server 14.04
+- Khai báo Repo cho CEPH đối với Ubuntu Server 14.04
   ```sh
   wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
   echo deb http://download.ceph.com/debian-jewel/ trusty main | sudo tee /etc/apt/sources.list.d/ceph.list
   ```
-- Th?c hi?n update sau khi khai b�o repos v� kh?i d?ng l?i
+- Thực hiện update sau khi khai báo repos và khởi động lại
   ```sh
   apt-get update -y && apt-get upgrade -y && apt-get dist-upgrade -y && init 6
   ```
 
-- C�i d?t c�c g�i ceph ph�a client
+- Cài đặt các gói ceph phía client
   ```sh
   sudo apt-get install -y python-rbd ceph-common
   ```
 
-- T?o user `ceph-deploy` d? s? d?ng cho vi?c c�i d?t cho CEPH.
+- Tạo user `ceph-deploy` để sử dụng cho việc cài đặt cho CEPH.
   ```sh
   sudo useradd -m -s /bin/bash ceph-deploy
   ```
 
-- �?t m?t m?u cho user `ceph-deploy`  
+- Đặt mật mẩu cho user `ceph-deploy`  
   ```sh
   sudo passwd ceph-deploy
   ```
 
-- Ph�n quy?n cho user `ceph-deploy`
+- Phân quyền cho user `ceph-deploy`
   ```sh
   echo "ceph-deploy ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph-deploy
   sudo chmod 0440 /etc/sudoers.d/ceph-deploy
   ```
 
-#### Bu?c 2: Chu?n b? tr�n Server CEPH 
+#### Bước 2: Chuẩn bị trên Server CEPH 
 
-- Login v�o m�y ch? CEPH AIO v� th?c hi?n c�c l?nh du?i
-  - Khai b�o th�m host c?a client 
+- Login vào máy chủ CEPH AIO và thực hiện các lệnh dưới
+  - Khai báo thêm host của client 
     ```sh
     echo "10.10.10.52 ubuntuclient2" >> /etc/hosts
     ```
     
-  - Chuy?n sang t�i kho?n `ceph-deploy` d? th?c hi?n c�i d?t
+  - Chuyển sang tài khoản `ceph-deploy` để thực hiện cài đặt
     ```sh
     sudo su - ceph-deploy
     
     cd cluster-ceph
     ```
     
-  - Copy ssh key d� t?o tru?c d� sang client, g� `yes` v� nh?p m?t kh?u c?a user `ceph-deploy` ph�a client d� t?o tru?c d�.
+  - Copy ssh key đã tạo trước đó sang client, gõ `yes` và nhập mật khẩu của user `ceph-deploy` phía client đã tạo trước đó.
     ```sh
     ssh-copy-id ceph-deploy@ubuntuclient2
     ```
   
-- Th?c hi?n copy file config cho ceph v� key sang client
+- Thực hiện copy file config cho ceph và key sang client
 ```sh
 ceph-deploy admin ubuntuclient2
 ```
 
-#### Bu?c 3: T?o c�c RBD tr�n client 
-- Login v�o m� h�nh c?a m�y client d? th?c hi?n c�c bu?c ti?p theo nhu sau:
-- Chuy?n sang quy?n `root`
+#### Bước 3: Tạo các RBD trên client 
+- Login vào mà hình của máy client để thực hiện các bước tiếp theo như sau:
+- Chuyển sang quyền `root`
   ```sh
   su -
   ```
-- Ph�n quy?n cho file `/etc/ceph/ceph.client.admin.keyring` v?a du?c copy sang ? tr�n
+- Phân quyền cho file `/etc/ceph/ceph.client.admin.keyring` vừa được copy sang ở trên
   ```sh
   sudo chmod +r /etc/ceph/ceph.client.admin.keyring
   ```
 
-- Ki?m tra tr?ng th�i c?a CEPH t? client
+- Kiểm tra trạng thái của CEPH từ client
   ```sh
   ceph -s
   ```
-  - K?t qu? l�:
+  - Kết quả là:
     ```sh
     root@ubuntuclient2:/etc/ceph# ceph -s
         cluster 2406781c-afdf-40c5-83a4-3ae49b2a3dea
@@ -681,50 +681,50 @@ ceph-deploy admin ubuntuclient2
                       64 active+clean
     ```
 
-- Kh?i d?ng rbdmap c�ng OS
+- Khởi động rbdmap cùng OS
   ```sh
   sudo update-rc.d rbdmap defaults
   ```
 
-- C�i d?t th�m g�i `xfsprogs` d? c� th? s? d?ng l?nh `mkfs.xfs`
+- Cài đặt thêm gói `xfsprogs` để có thể sử dụng lệnh `mkfs.xfs`
   ```sh
   sudo apt-get install xfsprogs
   ```
-- T?o 1 RBD c� dung lu?ng 10Gb
+- Tạo 1 RBD có dung lượng 10Gb
   ```sh
   rbd create disk02 --size 10240
   ```
-  - C� th? ki?m tra l?i k?t qu? t?o b?ng l?nh
+  - Có thể kiểm tra lại kết quả tạo bằng lệnh
     ```sh
     rbd ls -l
     ```
  
-- Ch?y l?nh du?i d? fix l?i `RBD image feature set mismatch. You can disable features unsupported by the kernel with "rbd feature disable".` ? b?n  CEPH Jewel. Luu � t? kh�a `disk02` trong l?nh, n� l� t�n image c?a rbd du?c t?o.
+- Chạy lệnh dưới để fix lỗi `RBD image feature set mismatch. You can disable features unsupported by the kernel with "rbd feature disable".` ở bản  CEPH Jewel. Lưu ý từ khóa `disk02` trong lệnh, nó là tên image của rbd được tạo.
   ```sh
   rbd feature disable rbd/disk02 fast-diff,object-map,exclusive-lock,deep-flatten
   ```
 
   
-- Th?c hi?n map rbd v?a t?o 
+- Thực hiện map rbd vừa tạo 
   ```sh
   sudo rbd map disk02 
   ```
-  - Ki?m tra l?i k?t qu? map b?ng l?nh du?i
+  - Kiểm tra lại kết quả map bằng lệnh dưới
     ```sh
     rbd showmapped 
     ```
   
-- Th?c hi?n format disk v?a du?c map
+- Thực hiện format disk vừa được map
   ```sh
   sudo mkfs.xfs /dev/rbd1
   ```
   
-- Th?c hi?n mount disk v?a du?c format d? s? d?ng (mount v�o thu m?c `mnt` c?a client)
+- Thực hiện mount disk vừa được format để sử dụng (mount vào thư mục `mnt` của client)
   ```sh
   sudo mount /dev/rbd1 /mnt
   ```
 
-- Ki?m tra l?i vi?c mount d� th�nh c�ng hay chua b?ng m?t trong c�c l?nh du?i
+- Kiểm tra lại việc mount đã thành công hay chưa bằng một trong các lệnh dưới
   ```sh
   df -hT
   ```
@@ -732,32 +732,32 @@ ceph-deploy admin ubuntuclient2
   ```sh
   lsblk
   ```
-- T?o th? 1 file 5GB v�o thu m?c `/mnt` b?ng l?nh `dd`. L?nh n�y th?c hi?n tr�n client.
+- Tạo thử 1 file 5GB vào thư mục `/mnt` bằng lệnh `dd`. Lệnh này thực hiện trên client.
   ```sh
   cd /mnt 
   
   dd if=/dev/zero of=test bs=1M count=5000
   ```
-  - N?u mu?n quan s�t qu� tr�nh ghi d?c tr�n server CEPH-AIO th� th?c hi?n l?nh `ceph -w` 
+  - Nếu muốn quan sát quá trình ghi đọc trên server CEPH-AIO thì thực hiện lệnh `ceph -w` 
 
-- M?c d?nh khi kh?i d?ng l?i th� vi?c map rbd s? b? m?t, x? l� nhu sau:
-  - M? file /etc/ceph/rbdmap v� th�m d�ng du?i
+- Mặc định khi khởi động lại thì việc map rbd sẽ bị mất, xử lý như sau:
+  - Mở file /etc/ceph/rbdmap và thêm dòng dưới
     ```sh
     rbd/disk02   id=admin,keyring=/etc/ceph/ceph.client.admin.keyring
     ```
-    - Luu � c?n khai b�o pool `rbd` v� t�n images l� `disk01` d� du?c khai b�o ? b�n tr�n.
+    - Lưu ý cần khai báo pool `rbd` và tên images là `disk01` đã được khai báo ở bên trên.
     
-  - S?a file `/etc/fstab` d? vi?c mount du?c th?c hi?n m?i khi kh?i d?ng l?i OS, th�m d�ng
+  - Sửa file `/etc/fstab` để việc mount được thực hiện mỗi khi khởi động lại OS, thêm dòng
     ```sh
     /dev/rbd1   /mnt  xfs defaults,noatime,_netdev        0       0
     ```
     
-  - Trong qu� tr�nh lab v?i client l� ubuntu t�i g?p hi?n tu?ng kh?i d?ng l?i Client 2 l?n th� m?i dang nh?p du?c, chua hi?u t?i sao l?i b? t�nh tr?ng nhu v?y.
+  - Trong quá trình lab với client là ubuntu tôi gặp hiện tượng khởi động lại Client 2 lần thì mới đăng nhập được, chưa hiểu tại sao lại bị tình trạng như vậy.
 
   
-### 7. C�c ghi ch� c?u h�nh client s? d?ng CEPH 
+### 7. Các ghi chú cấu hình client sử dụng CEPH 
 
-- File l?i khi th?c hi?n `map` c�c rbd, n?u ch?y xu?t hi?n l?i du?i
+- File lỗi khi thực hiện `map` các rbd, nếu chạy xuất hiện lỗi dưới
   ```sh
   ceph-deploy@client:~$ sudo rbd map disk01
   rbd: sysfs write failed
@@ -766,23 +766,23 @@ ceph-deploy admin ubuntuclient2
   rbd: map failed: (6) No such device or address
   ```
   
-  - Th� th?c hi?n
+  - Thì thực hiện
     ```sh
     rbd feature disable rbd/disk01 fast-diff,object-map,exclusive-lock,deep-flatten
     ```
-    - Luu � t? kh�a `disk02` trong l?nh, n� l� t�n image c?a rbd du?c t?o.
+    - Lưu ý từ khóa `disk02` trong lệnh, nó là tên image của rbd được tạo.
     
-- N?u khi th?c hi?n format ph�n v�ng RBD tr�n client`sudo: mkfs.xfs: command not found`, th� c?n c�i d?t g�i d? s? d?ng l?nh `mkfs.xfs`
+- Nếu khi thực hiện format phân vùng RBD trên client`sudo: mkfs.xfs: command not found`, thì cần cài đặt gói để sử dụng lệnh `mkfs.xfs`
   ```sh
   sudo apt-get install xfsprogs
   ```  
 
-- L?nh d? xem thu?c t�nh c?a c�c lo?i disk trong linux
+- Lệnh để xem thuộc tính của các loại disk trong linux
   ```sh
   blkid
   ```
   
-- L?nh xem c�c pool trong CEPH
+- Lệnh xem các pool trong CEPH
   ``` 
   root@ubuntuclient2:~# ceph osd lspools
   0 rbd,
