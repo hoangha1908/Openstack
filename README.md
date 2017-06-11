@@ -102,4 +102,13 @@
   sh verify.sh    
   ```
  
-
+- Bước 14: Truy cập Horizon: 
+   * http://IP_PROVIDER_MANAGER/dashboard
+   * Tài khoản đăng nhập: admin/$PW_SV  
+- Bước 15: Tạo Instance ([Chi tiết](https://docs.openstack.org/ocata/install-guide-rdo/launch-instance.html))
+   * Tạo Virutal Network
+   * Tạo subnet cho Network
+   * Tạo một flavor
+   * Tạo keypair
+   * Add rule cho phép ping, ssh 
+   * Tạo 1 insntace với các lựa chọn trên
