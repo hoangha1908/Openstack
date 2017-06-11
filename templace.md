@@ -16,6 +16,7 @@
 ## 3. IP Planning
 - Phân hoạch IP cho các máy chủ trong mô hình trên, nếu chỉ dựng CEPH-AIO thì chỉ cần quan tâm tới node CEPH-AIO
 ![img](images/ip-Planning-CEPH_AIO_CentOS7.2.png)
+![img](image15977744_1230275100375352_371460590324216329_n.jpg)
 
 ## 4. Chuẩn bị và môi trường LAB
  
