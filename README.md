@@ -1,40 +1,42 @@
 # Hướng dẫn cài đặt OPENSTACK OCATA sử dụng `script` trên 2 máy node
 
 ## 1. Mục tiêu LAB
-- Mô hình này sẽ cài tất cả các thành phần của CEPH lên một máy duy nhất, bao gồm:
-  - ceph-deploy
-  - ceph-admin
-  - mon
-  - OSD
-- LAB này chỉ phù hợp với việc nghiên cức các tính năng và demo thử nghiệm, không áp dụng được trong thực tế.
-- Việc dựng CEPH-AIO có thể chạy theo đúng mô hình này hoặc theo mô hình để tích hợp cùng OpenStack tại tài liệu này [link tài liệu]
+- Mô hình này sẽ cài các thành phần Service CORE của OPS bao gồm:
+  - Controller
+    * Chrony
+    * RabbitMQ
+    * Memcached
+    * Keystone
+    * Glance
+    * Nova
+    * Neutron
+  - Compute
+    * Chrony
+    * Nova
+    * Neutron
+- Mô hình này sẽ sử dụng Network với kiến trúc Provider
 
 ## 2. Mô hình 
-- Sử dụng mô hình dưới để cài đặt CEPH AIO, nếu chỉ dựng CEPH AIO thì chỉ cần một máy chủ để cài đặt CEPH. 
-![img](images/topology_CEPH_AIO_CentOS7.2.png)
+![img](image/topo.jpg)
 
-## 3. IP Planning
-- Phân hoạch IP cho các máy chủ trong mô hình trên, nếu chỉ dựng CEPH-AIO thì chỉ cần quan tâm tới node CEPH-AIO
-![img](images/ip-Planning-CEPH_AIO_CentOS7.2.png)
-![img](image/15977744_1230275100375352_371460590324216329_n.jpg)
-
-## 4. Chuẩn bị và môi trường LAB
- 
+## 3. Chuẩn bị môi trường LAB 
+- Hardware: 4 CPU, 8GB RAM, 50GB HDD
 - OS
-  - CentOS Server 7.2 64 bit
-  - 05: HDD, trong đó:
-    - `sda`: sử dụng để cài OS
-    - `sdb`: sử dụng làm `journal` (Journal là một lớp cache khi client ghi dữ liệu, thực tế thường dùng ổ SSD để làm cache)
-    - `sdc, sdd, sde`: sử dụng làm OSD (nơi chứa dữ liệu của client)
+  - CentOS Server 7.3 64 bit
   - 02 NICs: 
-    - `eno16777728`: dùng client (các máy trong OpenStack) sử dụng, sử dụng dải 10.10.10.0/24
-    - `eno33554952`: dùng để ssh và tải gói cho máy chủ CEPH AIO, sử dụng dải172.16.69.0/24
-    - `eno50332176`: dùng để replicate cho CEPH, dải 10.10.30.0/24
-  
-- CEPH Jewel
+    - `ens32`: dùng để ssh và tải gói cho máy chủ, các Instance cũng đi ra internet theo đường này, sử dụng dải 172.20.80.0/24
+    - `ens33`: dùng để các Service giao tiếp với nhau, sử dụng dải 10.100.100.0/24
 
-## 5. Cài đặt CEPH trên máy chủ CEPH
-- Nếu chưa login vào máy chủ CEPH-AIO bằng quyền `root` thì thực hiện chuyển sang quyền `root`
+## 4. Cài đặt theo đúng thứ tự các bước sau
+- Lưu ý:
+       * Tất cả câu lệnh đều thực hiện với quyền ROOT
+       * Thực hiện tại thư mục /root (Mặc định khi đăng nhập)
+       
+ - Bước 1:
+ 
+     
+        
+Nếu chưa login vào máy chủ CEPH-AIO bằng quyền `root` thì thực hiện chuyển sang quyền `root`
   ```sh
   su -
   ```
