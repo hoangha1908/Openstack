@@ -26,23 +26,26 @@
   - 02 NICs: 
     - `ens32`: dùng để ssh và tải gói cho máy chủ, các Instance cũng đi ra internet theo đường này, sử dụng dải 172.20.80.0/24
     - `ens33`: dùng để các Service giao tiếp với nhau, sử dụng dải 10.10.100.0/24
-- Down toàn bộ file script trong repo này xuống cả 2 node (Ae tự làm nhé)
+- Tải toàn bộ file script trong repo này xuống cả 2 node (Ae tự làm nhé)
 
 ## 4. Cài đặt theo đúng thứ tự các bước sau
 - Lưu ý :
-  - Tất cả câu lệnh đều thực hiện với quyền ROOT  
+  - Tất cả câu lệnh đều thực hiện với quyền `ROOT`  
   - Thực hiện tại thư mục /root (Mặc định khi đăng nhập)
 
 - Bước 1 - Controller Node:
-  * Mở file environment.sh và các tham số sau cho chuẩn môi trường  
+  * Mở file environment.sh và sửa các tham số sau cho chuẩn môi trường  
     - IP_PROVIDER, PREFIX_PROVIDER, GATEWAY, INTERFACE_NAME_PROVIDER: Thông tin card Provider  
     - IP_MANAGER, PREFIX_MANAGER, INTERFACE_NAME_MANAGER: Thông tin card Manager  
     - PW_DB: Mật khẩu truy cập Databasse, chung cho toàn bộ Service  
     - PW_SV: Mật khẩu truy cập Service, chung cho toàn bộ Service  
     - PW_MQ: Mật khẩu truy cập Username 'openstack' thuộc Service RabbitMQ
   
-
- 
+- Bước 2 - Controller Node:
+  * Tiến hành setup môi trường
+  ```sh
+  sh environment.sh
+ ```
      
         
 Nếu chưa login vào máy chủ CEPH-AIO bằng quyền `root` thì thực hiện chuyển sang quyền `root`
