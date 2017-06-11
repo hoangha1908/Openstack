@@ -1,4 +1,4 @@
-# Hướng dẫn cài đặt CEPH sử dụng `ceph-deploy` trên 1 máy duy nhất (CEPH AIO)
+# Hướng dẫn cài đặt OPENSTACK OCATA sử dụng `script` trên 2 máy node
 
 ## 1. Mục tiêu LAB
 - Mô hình này sẽ cài tất cả các thành phần của CEPH lên một máy duy nhất, bao gồm:
