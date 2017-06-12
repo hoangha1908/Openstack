@@ -47,24 +47,28 @@
   ```
   sh environment_controller.sh
   ```
+    
+- Bước 3 - Controller Node: Ssh lại và tiến hành cài đặt Memcached và MariaDB. Đồng thời Create các DB cần thiết
+  ```
+  sh memcached_maria.sh 
+  ```
   
   
-  
-- Bước 3 - Controller Node: Ssh lại và tiến hành cài đặt Keystone
+- Bước 4 - Controller Node: Tiến hành cài đặt Keystone
    ```
   sh keystone_controller.sh    
   ```
 
-- Bước 4 - Controller Node: Tiến hành cài đặt Glance
+- Bước 5 - Controller Node: Tiến hành cài đặt Glance
   ```
   sh glance_controller.sh    
   ```
   
-- Bước 5 - Controller Node: Tiến hành cài đặt Nova
+- Bước 6 - Controller Node: Tiến hành cài đặt Nova
   ```
   sh nova_controller.sh    
   ```
-- Bước 6 - Compute Node
+- Bước 7 - Compute Node
   * Mở file environment_compute.sh và sửa các tham số sau cho chuẩn môi trường  
     - IP_PROVIDER, PREFIX_PROVIDER, GATEWAY, INTERFACE_NAME_PROVIDER: Thông tin card Provider  
     - IP_MANAGER, PREFIX_MANAGER, INTERFACE_NAME_MANAGER: Thông tin card Manager  
@@ -74,39 +78,39 @@
     - PW_SV: Mật khẩu truy cập Service, chung cho toàn bộ Service  
     - PW_MQ: Mật khẩu truy cập Username 'openstack' thuộc Service RabbitMQ
     
-- Bước 7 - Compute Node: Tiến hành setup môi trường. Sẽ tự động `Reboot` khi setup xong
+- Bước 8 - Compute Node: Tiến hành setup môi trường. Sẽ tự động `Reboot` khi setup xong
   ```
   sh environment_compute.sh    
   ```
-- Bước 8 - Compute Node: Ssh lại và tiến hành cài đặt Nova
+- Bước 9 - Compute Node: Ssh lại và tiến hành cài đặt Nova
   ```
   sh nova_compute.sh    
   ```
-- Bước 9 - Controller Node: Tiến hành add host Compute vào hệ thống
+- Bước 10 - Controller Node: Tiến hành add host Compute vào hệ thống
   ```
   sh add_compute_node.sh    
   ```
-- Bước 10 - Controller Node: Tiến hành cài đặt Neutron
+- Bước 11 - Controller Node: Tiến hành cài đặt Neutron
   ```
   sh neutron_controller.sh    
   ```
-- Bước 11 - Compute Node: Tiến hành cài đặt Neutron
+- Bước 12 - Compute Node: Tiến hành cài đặt Neutron
   ```
   sh neutron_compute.sh    
   ```
-- Bước 12 - Controller Node: Tiến hành cài đặt Horizon
+- Bước 13 - Controller Node: Tiến hành cài đặt Horizon
   ```
   sh horizone_controller.sh    
   ```
-- Bước 13 - Controller Node: Verify lại toàn bộ dịch vụ
+- Bước 14 - Controller Node: Verify lại toàn bộ dịch vụ
   ```
   sh verify_controller.sh    
   ```
  
-- Bước 14: Truy cập Horizon: 
+- Bước 15: Truy cập Horizon: 
    * http://IP_PROVIDER_MANAGER/dashboard
    * Tài khoản đăng nhập: admin/$PW_SV  
-- Bước 15: Tạo Instance ([Chi tiết](https://docs.openstack.org/ocata/install-guide-rdo/launch-instance.html))
+- Bước 16: Tạo Instance ([Chi tiết](https://docs.openstack.org/ocata/install-guide-rdo/launch-instance.html))
    * Tạo Virutal Network
    * Tạo subnet cho Network
    * Tạo một flavor
