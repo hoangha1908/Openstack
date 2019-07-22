@@ -9,7 +9,7 @@
 - ... ... ...  
 
 ## 2. Chuẩn bị môi trường
-- Server KVM [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/OpenStack/blob/master/Ocata_Script/Setup_KVM.md)
+- Server KVM [Tham khảo](https://github.com/hoangha1908/Openstack/blob/master/Setup_KVM.md)
 - Download file ISO Ubuntu 16.04 - Server và lưu vào thư mục root trên Server KVM [Download](http://mirrors.nhanhoa.com/ubuntu-releases/16.04.2/ubuntu-16.04.2-server-amd64.iso)
 
 ## 3. Cài đặt Image
