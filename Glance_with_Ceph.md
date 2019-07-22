@@ -7,7 +7,7 @@
 ![img](image/topo_glance_with_ceph.jpg)
 
 ## 3. Chuẩn bị môi trường  
-- Hệ thống Openstack [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/OpenStack/blob/master/Ocata_Script/README.md)
+- Hệ thống Openstack [Tham khảo](https://github.com/hoangha1908/Openstack/blob/master/README.md)
 - Hệ thống Ceph [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/Ceph/blob/master/Docs/Deploy_Ceph_AIO.md)
 - Lưu ý: Mặt public của hệ thống Ceph phải cùng dải với mặt Manager của Openstack
 
