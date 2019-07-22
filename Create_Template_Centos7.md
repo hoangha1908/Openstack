@@ -9,7 +9,7 @@
 - ... ... ...  
 
 ## 2. Chuẩn bị môi trường
-- Server KVM [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/OpenStack/blob/master/Ocata_Script/Setup_KVM.md)
+- Server KVM [Tham khảo](https://github.com/hoangha1908/Openstack/blob/master/Setup_KVM.md)
 - Download file ISO Centos 7 x64 - Minimal và lưu vào thư mục root trên Server KVM [Download](http://mirrors.123host.vn/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso)
 
 ## 3. Cài đặt Image
