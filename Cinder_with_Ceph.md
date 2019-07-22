@@ -56,7 +56,8 @@
 <usage type="ceph">
 <name>client.volumes secret</name>
 </usage>
-</secret>```
+</secret>
+```
 - Bước 12 - Compute Node: Thực hiện add key volumes vào Hypervisor. Mục đích để có thể attach `Volumes` vô Instance  
   - virsh secret-define --file ceph.xml
   - virsh secret-set-value --secret 6b36ee8b-a719-4e9f-8c12-ed1d3eaecbab --base64 $(cat client.volumes.key)
