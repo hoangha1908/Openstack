@@ -7,9 +7,9 @@
 ![img](image/topo_cinder_with_ceph1.jpg)
 
 ## 3. Chuẩn bị môi trường  
-- Hệ thống Openstack [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/OpenStack/blob/master/Ocata_Script/README.md)
-- Hệ thống Ceph [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/Ceph/blob/master/Docs/Deploy_Ceph_AIO.md)
-- Tích hợp Glance với Ceph [Tham khảo](https://gitlab.hyperlogy.com/ISS-Hyperlogy/OpenStack/blob/master/Ocata_Script/Glance_with_Ceph.md)
+- Hệ thống Openstack [Tham khảo](https://github.com/hoangha1908/Openstack/blob/master/README.md)
+- Hệ thống Ceph [Tham khảo](https://github.com/hoangha1908/Ceph/blob/master/Deploy_Ceph_AIO.md)
+- Tích hợp Glance với Ceph [Tham khảo](https://github.com/hoangha1908/Openstack/blob/master/Glance_with_Ceph.md)
 - Lưu ý: Mặt public của hệ thống Ceph phải cùng dải với mặt Manager của Openstack
 
 ## 4. Cài đặt
